@@ -37,6 +37,7 @@ type
   ITSWebDriverBrowsers = interface
     ['{33FE127D-B125-4EFD-840F-6F44785CD065}']
     function Chrome: ITSWebDriverBrowser;
+    function Edge: ITSWebDriverBrowser;
   end;
 
 implementation

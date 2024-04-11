@@ -41,6 +41,8 @@ type
     function PrintPage(): string;
     function GetTitle(): string;
     function GetCurrentUrl(): string;
+    function GetWindowHandle(): string;
+    function MinimizeWindow(): ITSWebDriverBrowser;
   end;
 
 implementation
@@ -184,6 +186,11 @@ begin
   Result := Execute.Get(MakeURL(FSessionID, GET_CURRENT_URL));
 end;
 
+function TTSWebDriverBrowserBase.GetWindowHandle(): string;
+begin
+  Result := Execute.Get(MakeURL(FSessionID, GET_CURRENT_WINDOW_HANDLE));
+end;
+
 function TTSWebDriverBrowserBase.GetPageSource(): String;
 begin
   Result := Execute.Get(MakeURL(FSessionID, GET_PAGE_SOURCE));
@@ -240,6 +247,12 @@ begin
   if FDriverArguments.Count <= 0 then Exit;
 
   Result := ',' + String.Join(',', FDriverArguments.ToStringArray());
+end;
+
+function TTSWebDriverBrowserBase.MinimizeWindow: ITSWebDriverBrowser;
+begin
+  Execute.Post(MakeURL(FSessionID, MINIMIZE_WINDOW));
+  Result := Self;
 end;
 
 function TTSWebDriverBrowserBase.SessionID(AValue: string): ITSWebDriverBrowser;

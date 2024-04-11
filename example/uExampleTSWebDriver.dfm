@@ -32,8 +32,8 @@ object FrmMain: TFrmMain
     ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 0
-    ExplicitTop = 65
-    ExplicitWidth = 512
+    ExplicitTop = 73
+    ExplicitWidth = 514
   end
   object btnNavigateTo: TButton
     Left = 8

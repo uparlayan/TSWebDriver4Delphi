@@ -37,7 +37,7 @@ type
   private
     { Private declarations }
     FDriver: ITSWebDriverBase;
-    FChromeDriver: ITSWebDriverBrowser;
+    aBrowserDriver: ITSWebDriverBrowser;
     FBy: TSBy;
     procedure Run(AProc: TProc; AUrl: string = ''; ACloseSection: Boolean = True);
     procedure ExampleLoginAndScrap;
@@ -62,11 +62,22 @@ begin
 
   FDriver := TTSWebDriver.New.Driver();
   //FDriver.Options.DriverPath('.\a\b\c\webdriver.exe');
+  //FDriver.Options.DriverPath('C:\Users\RAD\Desktop\WebDriver\chromedriver.exe');  // Type the full path to chromedriver.exe (or msedgedriver.exe or webdriver.exe or similar...)
+  FDriver.Options.DriverPath('C:\Users\RAD\Desktop\WebDriver\msedgedriver.exe');  // Type the full path to msedgedriver.exe (or chromedriver.exe or webdriver.exe or similar...)
 
-  FChromeDriver := FDriver.Browser().Chrome();
-  //FChromeDriver
-    //.AddArgument('window-size', '1000,800')
-    //.AddArgument('user-data-dir', 'E:/Dev/Delphi/TSWebDriver4Delphi/example/cache');
+  // use this endpoint for chrome web driver download links.
+  // Find your chrome version in Endpoint and pull the appropriate one.
+  // https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json
+
+  // or for edge browser web driver
+  // https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/?form=MA13LH#downloads
+
+  aBrowserDriver := FDriver.Browser().Edge();  // or .Chrome()
+  aBrowserDriver
+    .AddArgument('window-size', '1000,800')
+    .AddArgument('window-minimize', '')
+    //.AddArgument('user-data-dir', 'E:/Dev/Delphi/TSWebDriver4Delphi/example/cache')
+  ;
 
   FDriver.Start();
 end;
@@ -75,17 +86,20 @@ procedure TFrmMain.Run(AProc: TProc; AUrl: string = ''; ACloseSection: Boolean =
 begin
   MemLog.Clear();
 
-  FChromeDriver.NewSession();
+  aBrowserDriver.NewSession();
+
+  aBrowserDriver.MinimizeWindow();
 
   if not AUrl.IsEmpty then
-    FChromeDriver.NavigateTo(AUrl);
+    aBrowserDriver.NavigateTo(AUrl);
 
-  FChromeDriver.WaitForPageReady();
+
+  aBrowserDriver.WaitForPageReady();
 
   AProc();
 
   if ACloseSection then
-    FChromeDriver.CloseSession();
+    aBrowserDriver.CloseSession();
 end;
 
 procedure TFrmMain.btnExample1Click(Sender: TObject);
@@ -131,7 +145,7 @@ end;
 procedure TFrmMain.btnExecuteScriptClick(Sender: TObject);
 begin
   MemLog.Text :=
-    FChromeDriver.ExecuteSyncScript(
+    aBrowserDriver.ExecuteSyncScript(
       InputBox('Script', '', 'return document.title'));
 end;
 
@@ -139,8 +153,8 @@ procedure TFrmMain.btnNavigateToClick(Sender: TObject);
 begin
   Self.Run(procedure
           begin
-            FChromeDriver.NavigateTo(
-              InputBox('Url', '', 'https://github.com/GabrielTrigo'));
+            aBrowserDriver.NavigateTo(
+              InputBox('Url', '', 'https://github.com/uparlayan'));
           end,
   '', False);
 end;
@@ -152,7 +166,7 @@ begin
     var
       LCheckbox: ITSWebDriverElement;
     begin
-      LCheckbox := FChromeDriver.FindElement(FBy.XPath('//input[@id=''checky'']'));
+      LCheckbox := aBrowserDriver.FindElement(FBy.XPath('//input[@id=''checky'']'));
 
       MemLog.Lines.Append(LCheckbox.GetAttribute('checked'));
       LCheckbox.Click();
@@ -168,15 +182,15 @@ var
   LElements: TTSWebDriverElementList;
 begin
   try
-    LElement := FChromeDriver.FindElement(FBy.Name('as_word'));
+    LElement := aBrowserDriver.FindElement(FBy.Name('as_word'));
 
     LElement.SendKeys('Macbook');
     // Send Enter key code > https://www.w3.org/TR/webdriver2/#element-send-keys
     LElement.SendKeys('\uE007');
 
-    FChromeDriver.WaitForPageReady();
+    aBrowserDriver.WaitForPageReady();
 
-    LElements := FChromeDriver.FindElements(FBy.ClassName('ui-search-layout__item'));
+    LElements := aBrowserDriver.FindElements(FBy.ClassName('ui-search-layout__item'));
 
     MemLog.Lines.Append('I finded ' + LElements.Count.ToString() + ' items');
 
@@ -196,13 +210,13 @@ procedure TFrmMain.ExampleDynamicElement;
 var
   LElement: ITSWebDriverElement;
 begin
-  LElement := FChromeDriver.FindElement(FBy.Id('adder'));
+  LElement := aBrowserDriver.FindElement(FBy.Id('adder'));
 
   LElement.Click();
 
-  FChromeDriver.WaitForSelector('#box0');
+  aBrowserDriver.WaitForSelector('#box0');
 
-  LElement := FChromeDriver.FindElement(FBy.Id('box0'));
+  LElement := aBrowserDriver.FindElement(FBy.Id('box0'));
 
   with MemLog.Lines do
   begin
@@ -215,19 +229,19 @@ begin
     AddPair('GetText', LElement.GetText()).Add('');
     AddPair('GetTagName', LElement.GetTagName()).Add('');
     AddPair('GetEnabled', BoolToStr(LElement.GetEnabled, True)).Add('');
-    AddPair('GetPageSource', FChromeDriver.GetPageSource()).Add('');
+    AddPair('GetPageSource', aBrowserDriver.GetPageSource()).Add('');
   end;
 end;
 
 procedure TFrmMain.ExampleGitHubBio;
 begin
-  FChromeDriver.FindElement(FBy.Name('username')).SendKeys('GabrielTrigo');
+  aBrowserDriver.FindElement(FBy.Name('username')).SendKeys('uparlayan');
 
-  FChromeDriver.FindElement(FBy.ID('search')).Click();
+  aBrowserDriver.FindElement(FBy.ID('search')).Click();
 
-  FChromeDriver.WaitForSelector('.media');
+  aBrowserDriver.WaitForSelector('.media');
 
-  with FChromeDriver.FindElement(FBy.CssSelector('.media-content > span')) do
+  with aBrowserDriver.FindElement(FBy.CssSelector('.media-content > span')) do
   begin
     MemLog.Lines.AddPair('GitHub bio', GetText());
   end;
@@ -238,7 +252,7 @@ var
   LElement: ITSWebDriverElement;
   LElements: TTSWebDriverElementList;
 begin
-  LElements := FChromeDriver.FindElements(FBy.CssSelector('.followers > article'));
+  LElements := aBrowserDriver.FindElements(FBy.CssSelector('.followers > article'));
 
   for LElement in LElements do
     with MemLog.Lines do
@@ -257,18 +271,18 @@ var
   LElements: TTSWebDriverElementList;
 begin
   try
-    FChromeDriver.FindElement(FBy.Name('user-name')).SendKeys('standard_user');
-    FChromeDriver.FindElement(FBy.ID('password')).SendKeys('secret_sauce');
-    FChromeDriver.FindElement(FBy.Name('login-button')).Click();
+    aBrowserDriver.FindElement(FBy.Name('user-name')).SendKeys('standard_user');
+    aBrowserDriver.FindElement(FBy.ID('password')).SendKeys('secret_sauce');
+    aBrowserDriver.FindElement(FBy.Name('login-button')).Click();
 
-    LElements := FChromeDriver.FindElements(FBy.ClassName('inventory_item'));
+    LElements := aBrowserDriver.FindElements(FBy.ClassName('inventory_item'));
 
     for LElement in LElements do
       with MemLog.Lines do
       begin
-        AddPair('Name', LElement.FindElement(FBy.ClassName('inventory_item_name')).GetText());
+        AddPair('Name'       , LElement.FindElement(FBy.ClassName('inventory_item_name')).GetText());
         AddPair('Description', LElement.FindElement(FBy.ClassName('inventory_item_desc')).GetText());
-        AddPair('Price', LElement.FindElement(FBy.ClassName('inventory_item_price')).GetText());
+        AddPair('Price'      , LElement.FindElement(FBy.ClassName('inventory_item_price')).GetText());
         Append('-------------------------');
       end;
   finally

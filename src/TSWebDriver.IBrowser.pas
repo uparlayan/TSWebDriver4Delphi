@@ -30,6 +30,8 @@ type
     function PrintPage(): string;
     function GetTitle(): string;
     function GetCurrentUrl(): string;
+    function GetWindowHandle(): string;
+    function MinimizeWindow(): ITSWebDriverBrowser;
   end;
 
 implementation

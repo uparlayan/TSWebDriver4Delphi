@@ -98,13 +98,13 @@ object FrmMain: TFrmMain
     TabOrder = 7
     OnClick = btnExample3Click
   end
-  object Button1: TButton
+  object btnExample6: TButton
     Left = 215
     Top = 41
     Width = 75
     Height = 25
-    Caption = 'Button1'
+    Caption = 'Example 6'
     TabOrder = 8
-    OnClick = Button1Click
+    OnClick = btnExample6Click
   end
 end

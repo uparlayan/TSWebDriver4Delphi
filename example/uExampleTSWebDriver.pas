@@ -24,7 +24,7 @@ type
     btnExample1: TButton;
     btnExample2: TButton;
     btnExample3: TButton;
-    Button1: TButton;
+    btnExample6: TButton;
     procedure FormCreate(Sender: TObject);
     procedure btnExecuteScriptClick(Sender: TObject);
     procedure btnExample4Click(Sender: TObject);
@@ -33,7 +33,7 @@ type
     procedure btnExample3Click(Sender: TObject);
     procedure btnNavigateToClick(Sender: TObject);
     procedure btnExample1Click(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure btnExample6Click(Sender: TObject);
   private
     { Private declarations }
     FDriver: ITSWebDriverBase;
@@ -80,6 +80,9 @@ begin
   ;
 
   FDriver.Start();
+
+  // Added abilities;
+  // https://w3c.github.io/webdriver/#minimize-window
 end;
 
 procedure TFrmMain.Run(AProc: TProc; AUrl: string = ''; ACloseSection: Boolean = True);
@@ -159,7 +162,7 @@ begin
   '', False);
 end;
 
-procedure TFrmMain.Button1Click(Sender: TObject);
+procedure TFrmMain.btnExample6Click(Sender: TObject);
 begin
   Self.Run(
     procedure

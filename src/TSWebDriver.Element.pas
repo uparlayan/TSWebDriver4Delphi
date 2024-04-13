@@ -22,6 +22,10 @@ type
 
     function GetTagName: string;
     function GetText: string;
+    /// <summary>
+    ///  Text compatible with the numeric SQL value. Like this: "12.345,01" -> "12345.01"
+    /// </summary>
+    function GetNumeric: string;
     function GetEnabled: Boolean;
     function GetSelected: Boolean;
     function GetLocation: TPoint;
@@ -242,6 +246,11 @@ begin
     .Replace(':id', FElementID, [rfIgnoreCase]);
 
   Result := FDriver.Execute.Get(lUrl);
+end;
+
+function TTSWebDriverElement.GetNumeric: string;
+begin
+  Result := StringReplace(StringReplace(GetText, '.', '', [rfReplaceAll]), ',', '.', [rfReplaceAll]);
 end;
 
 function TTSWebDriverElement.IsEmpty: Boolean;

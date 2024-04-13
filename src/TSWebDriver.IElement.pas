@@ -14,6 +14,10 @@ type
     ['{EA5EC985-C2AE-47AC-85E9-2833BB815962}']
     function GetTagName: string;
     function GetText: string;
+    /// <summary>
+    ///  Text compatible with the numeric SQL value. Like this: "12.345,01" -> "12345.01"
+    /// </summary>
+    function GetNumeric: string;
     function GetEnabled: Boolean;
     function GetSelected: Boolean;
     function GetLocation: TPoint;

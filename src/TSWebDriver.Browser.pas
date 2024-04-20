@@ -1,4 +1,5 @@
 unit TSWebDriver.Browser;
+
 interface
 
 uses
@@ -34,7 +35,6 @@ type
     function WaitForSelector(AValue: string; ATimeout: Integer = 15000): ITSWebDriverBrowser;
     procedure WaitForPageReady(ATimeout: Integer = 15000);
     function GetPageSource(): String;
-
     procedure Refresh();
     procedure &Forward();
     procedure Back();
@@ -62,10 +62,8 @@ end;
 destructor TTSWebDriverBrowserBase.Destroy();
 begin
   Self.CloseSession();
-
   if Assigned(FDriverArguments) then
     FreeAndNil(FDriverArguments);
-
   inherited;
 end;
 
@@ -73,12 +71,10 @@ function TTSWebDriverBrowserBase.AddArgument(AKey: String; AValue: String = ''):
 begin
   AKey := AKey.Trim().ToLower();
   AValue := AValue.Trim().ToLower();
-
   if not AValue.IsEmpty then
     FDriverArguments.Add(AnsiQuotedStr(Format('--%s=%s', [AKey, AValue]), '"'))
   else
     FDriverArguments.Add(AnsiQuotedStr(Format('--%s', [AKey]), '"'));
-
   Result := Self;
 end;
 
@@ -98,7 +94,6 @@ end;
 function TTSWebDriverBrowserBase.ExecuteSyncScript(AScript: string; AParameters: string = '{}'; AArgs: string = '[]'): string;
 begin
   Result := EmptyStr;
-
   Result := Execute.Post(MakeURL(FSessionID, EXECUTE_SCRIPT),
     Format('{"script":"%s","parameters":%s,"args":%s}',
       [AScript, AParameters, AArgs])
@@ -113,7 +108,6 @@ end;
 function TTSWebDriverBrowserBase.ExecuteAsyncScript(AScript: string; AParameters: string = '{}'; AArgs: string = '[]'): string;
 begin
   Result := EmptyStr;
-
   Result := Execute.Post(MakeURL(FSessionID, EXECUTE_ASYNC_SCRIPT),
     Format('{"script":"%s","parameters":%s,"args":%s}', [AScript, AParameters, AArgs]));
 end;
@@ -129,15 +123,12 @@ var
   lUrl: string;
 begin
   Result := TTSWebDriverElement.New(Self);
-
   if AElementId.IsEmpty then
     lUrl := MakeURL(FSessionID, FIND_ELEMENT)
   else
     lUrl := MakeURL(FSessionID, FIND_CHILD_ELEMENT).Replace(':id', AElementId);
-
   lResponseData := Execute.Post(lUrl,
     Format('{"using":"%s","value":"%s"}', [AValue.UsingName, AValue.KeyName]));
-
   if lResponseData <> EmptyStr then
     Result.LoadFromJson(lResponseData);
 end;
@@ -156,21 +147,16 @@ begin
       lUrl := MakeURL(FSessionID, FIND_ELEMENTS)
     else
       lUrl := MakeURL(FSessionID, FIND_CHILD_ELEMENTS).Replace(':id', AElementId);
-
     lResponseData := Execute.Post(lUrl,
       Format('{"using":"%s","value":"%s"}', [AValue.UsingName, AValue.KeyName]));
-
     if lResponseData = EmptyStr then Exit;
-
     lJsonArray := TJSONObject.ParseJSONValue(lResponseData).AsType<TJSONArray>;
-
     for lJsonValue in lJsonArray do
     begin
       lTSWebDriverElement := TTSWebDriverElement.New(Self);
       lTSWebDriverElement.LoadFromJson(lJsonValue.ToJSON());
       Result.Add(lTSWebDriverElement);
     end;
-
   finally
     FreeAndNil(lJsonArray);
   end;
@@ -216,17 +202,14 @@ var
 begin
   //add extra args for webdriver session
   LArgs := StringReplace(NEW_SESSION_JSON, '@extra_args', HandleCustomArgs(), [rfReplaceAll, rfIgnoreCase]);
-
   LResponse :=
     Execute.Post(MakeURL(FSessionID, NEW_SESSION), LArgs);
-
   try
     LJSONResponse := TJSONObject.ParseJSONValue(LResponse);
     LJSONResponse.TryGetValue<string>('sessionId', FSessionID);
   finally
     FreeAndNil(LJSONResponse);
   end;
-
   Result := Self;
 end;
 
@@ -243,9 +226,7 @@ end;
 function TTSWebDriverBrowserBase.HandleCustomArgs(): string;
 begin
   Result := EmptyStr;
-
   if FDriverArguments.Count <= 0 then Exit;
-
   Result := ',' + String.Join(',', FDriverArguments.ToStringArray());
 end;
 
